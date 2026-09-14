@@ -7,481 +7,808 @@ from utils.job_matcher import extract_job_skills, calculate_match
 from utils.resume_scorer import calculate_resume_score
 from utils.resume_analyzer import analyze_resume
 from utils.ats_analyzer import compare_keywords
+from utils.similarity_analyzer import calculate_text_similarity
+from utils.report_generator import generate_report
 
 
-# ---------------------------------------------------------
-# Page configuration
-# ---------------------------------------------------------
+# ==================================================
+# PAGE CONFIGURATION
+# ==================================================
+
 st.set_page_config(
     page_title="AI/ML Resume Analyzer",
     page_icon="📄",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="expanded"
 )
 
 
-# ---------------------------------------------------------
-# Custom styling
-# ---------------------------------------------------------
+# ==================================================
+# CUSTOM CSS
+# ==================================================
+
 st.markdown(
     """
     <style>
-    .main {
-        padding-top: 1.5rem;
+
+    /* Main background */
+    .stApp {
+        background-color: #0e1117;
     }
 
-    .hero {
-        padding: 1.5rem 1.8rem;
-        border-radius: 18px;
-        border: 1px solid rgba(128,128,128,0.25);
-        background: linear-gradient(
-            135deg,
-            rgba(49,51,63,0.95),
-            rgba(30,32,42,0.95)
-        );
-        margin-bottom: 1.5rem;
+    /* Sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: #161b22;
     }
 
-    .hero h1 {
-        margin: 0;
-        font-size: 2.25rem;
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] p {
+        color: white;
     }
 
-    .hero p {
-        margin: 0.45rem 0 0;
-        opacity: 0.78;
-        font-size: 1rem;
-    }
-
-    .section-title {
-        font-size: 1.35rem;
+    /* Main title */
+    .main-title {
+        font-size: 42px;
         font-weight: 700;
-        margin-top: 1.2rem;
-        margin-bottom: 0.7rem;
+        margin-bottom: 5px;
     }
 
-    .score-card {
-        border: 1px solid rgba(128,128,128,0.25);
-        border-radius: 16px;
-        padding: 1rem 1.1rem;
-        min-height: 125px;
-        background: rgba(128,128,128,0.06);
+    .subtitle {
+        color: #a9b1bd;
+        font-size: 17px;
+        margin-bottom: 30px;
     }
 
-    .score-label {
-        font-size: 0.9rem;
-        opacity: 0.75;
-        margin-bottom: 0.35rem;
-    }
-
-    .score-value {
-        font-size: 2rem;
-        font-weight: 750;
-        line-height: 1.1;
-    }
-
-    .skill-box {
-        border: 1px solid rgba(128,128,128,0.22);
-        border-radius: 12px;
-        padding: 0.65rem 0.8rem;
-        margin: 0.35rem 0;
-        background: rgba(128,128,128,0.045);
-    }
-
-    .skill-ok {
-        border-left: 4px solid #21c55d;
-    }
-
-    .skill-missing {
-        border-left: 4px solid #ef4444;
-    }
-
-    .analysis-box {
-        border: 1px solid rgba(128,128,128,0.22);
+    /* Metric cards */
+    div[data-testid="metric-container"] {
+        background-color: #161b22;
+        border: 1px solid #30363d;
         border-radius: 14px;
-        padding: 0.85rem 1rem;
-        margin-bottom: 0.55rem;
-        background: rgba(128,128,128,0.04);
+        padding: 18px;
+        min-height: 120px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
 
-    .small-muted {
-        opacity: 0.65;
-        font-size: 0.85rem;
+    div[data-testid="metric-container"]:hover {
+        border-color: #58a6ff;
+        transform: translateY(-2px);
+        transition: 0.2s ease;
     }
 
-    div[data-testid="stMetric"] {
-        border: 1px solid rgba(128,128,128,0.22);
+    /* Section headings */
+    h2, h3 {
+        color: white;
+        font-weight: 700;
+        margin-top: 25px;
+        margin-bottom: 12px;
+    }
+
+    h3 {
+        font-size: 22px;
+    }
+
+    /* Upload box */
+    section[data-testid="stFileUploaderDropzone"] {
+        background-color: #161b22;
+        border: 1px dashed #484f58;
         border-radius: 14px;
-        padding: 0.7rem;
+        padding: 10px;
+        transition: 0.2s ease;
     }
+
+    section[data-testid="stFileUploaderDropzone"]:hover {
+        border-color: #58a6ff;
+    }
+
     </style>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
 
-# ---------------------------------------------------------
-# Sidebar
-# ---------------------------------------------------------
+# ==================================================
+# SIDEBAR
+# ==================================================
+
 with st.sidebar:
-    st.markdown("## 📄 Resume Analyzer")
-    st.caption("AI/ML • NLP • ATS Analysis")
 
-    st.markdown("---")
-    st.markdown("### How it works")
     st.markdown(
-        """
-        1. Upload a resume
-        2. Extract resume text
-        3. Detect technical skills
-        4. Compare with the job description
-        5. Analyze ATS keywords
-        6. Generate improvement suggestions
-        """
+        "<h1 style='text-align:center;'>📄</h1>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        "## AI/ML Resume Analyzer"
+    )
+
+    st.caption(
+        "NLP • ATS • Machine Learning"
     )
 
     st.markdown("---")
-    st.markdown("### Supported files")
-    st.write("📕 PDF")
-    st.write("📘 DOCX")
+
+    st.markdown("### 🏠 Dashboard")
+
+    st.write("📄 Resume Analysis")
+    st.write("🎯 Job Matching")
+    st.write("🤖 ATS Analysis")
+    st.write("🧠 NLP Similarity")
 
     st.markdown("---")
-    st.caption("Mini Project • AI/ML Resume Analyzer")
+
+    st.markdown("### ⚙️ Analysis Features")
+
+    st.write("✅ Resume Text Extraction")
+    st.write("✅ Skill Detection")
+    st.write("✅ Keyword Matching")
+    st.write("✅ TF-IDF Similarity")
+    st.write("✅ Resume Scoring")
+
+    st.markdown("---")
+
+    st.markdown("### 👨‍💻 Developed By")
+
+    st.markdown(
+        "**Ansh Vishwakarma**"
+    )
+
+    st.caption(
+        "B.Tech CSE (AI/ML)"
+    )
+
+    github_col, linkedin_col = st.columns(2)
+
+    with github_col:
+
+        st.link_button(
+            "💻 GitHub",
+            "https://github.com/Anshvishwakarma51",
+            use_container_width=True
+        )
+
+    with linkedin_col:
+
+        st.link_button(
+            "🔗 LinkedIn",
+            "https://www.linkedin.com/in/anshvishwakarma51/",
+            use_container_width=True
+        )
+
+    st.markdown("---")
+
+    st.caption(
+        "Mini Project • Version 1.0"
+    )
 
 
-# ---------------------------------------------------------
-# Header
-# ---------------------------------------------------------
+# ==================================================
+# MAIN HEADER
+# ==================================================
+
 st.markdown(
-    """
-    <div class="hero">
-        <h1>📄 AI/ML Resume Analyzer</h1>
-        <p>
-            Upload your resume and compare it with a job description
-            using NLP-based skill and keyword analysis.
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
+    '<div class="main-title">📄 AI/ML Resume Analyzer</div>',
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    '<div class="subtitle">Analyze your resume and compare it with a job description using NLP and machine learning techniques.</div>',
+    unsafe_allow_html=True
 )
 
 
-# ---------------------------------------------------------
-# Input section
-# ---------------------------------------------------------
-st.markdown('<div class="section-title">📥 Upload & Job Description</div>', unsafe_allow_html=True)
+# ==================================================
+# INPUT FORM
+# ==================================================
 
-col1, col2 = st.columns([1, 1], gap="large")
+with st.form("resume_analysis_form"):
 
-with col1:
-    uploaded_file = st.file_uploader(
-        "📄 Upload your Resume",
-        type=["pdf", "docx"],
-        help="Upload a PDF or DOCX resume.",
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.subheader("📄 Upload Resume")
+
+        uploaded_file = st.file_uploader(
+            "Upload your PDF or DOCX resume",
+            type=["pdf", "docx"]
+        )
+
+    with col2:
+
+        st.subheader("💼 Job Description")
+
+        job_description = st.text_area(
+            "Paste the job description here",
+            height=250,
+            placeholder="Example: Python Developer with knowledge of Machine Learning, NLP, SQL, Git and Streamlit..."
+        )
+
+    st.markdown("")
+
+    analyze_button = st.form_submit_button(
+        "🔍 Analyze Resume",
+        use_container_width=True
     )
 
-with col2:
-    job_description = st.text_area(
-        "💼 Paste Job Description",
-        height=210,
-        placeholder="Paste the complete job description here...",
-        help="The analyzer will compare the resume against this job description.",
+
+# ==================================================
+# ANALYSIS
+# ==================================================
+
+if analyze_button:
+
+    # --------------------------------------------------
+    # Validate Resume
+    # --------------------------------------------------
+
+    if uploaded_file is None:
+
+        st.warning(
+            "⚠️ Please upload a PDF or DOCX resume."
+        )
+
+        st.stop()
+
+
+    # --------------------------------------------------
+    # Validate Job Description
+    # --------------------------------------------------
+
+    if not job_description.strip():
+
+        st.warning(
+            "⚠️ Please enter a job description."
+        )
+
+        st.stop()
+
+
+    # --------------------------------------------------
+    # Success Message
+    # --------------------------------------------------
+
+    st.success(
+        f"Resume uploaded successfully: {uploaded_file.name}"
     )
 
 
-# ---------------------------------------------------------
-# Main processing
-# ---------------------------------------------------------
-if uploaded_file is not None:
+    # ==================================================
+    # RESUME PROCESSING
+    # ==================================================
 
-    st.success(f"Resume uploaded successfully: {uploaded_file.name}")
+    # --------------------------------------------------
+    # Extract Resume Text
+    # --------------------------------------------------
 
-    # Extract resume text
-    try:
-        if uploaded_file.name.lower().endswith(".pdf"):
-            resume_text = extract_text_from_pdf(uploaded_file)
-        else:
-            resume_text = extract_text_from_docx(uploaded_file)
-    except Exception as exc:
-        st.error(f"Could not read the resume: {exc}")
+    if uploaded_file.name.lower().endswith(".pdf"):
+
+        resume_text = extract_text_from_pdf(
+            uploaded_file
+        )
+
+    else:
+
+        resume_text = extract_text_from_docx(
+            uploaded_file
+        )
+
+
+    # --------------------------------------------------
+    # Check Extracted Text
+    # --------------------------------------------------
+
+    if not resume_text.strip():
+
+        st.error(
+            "❌ Unable to extract text from this resume."
+        )
+
         st.stop()
 
-    if not resume_text or not resume_text.strip():
-        st.warning("No readable text was found in this resume.")
-        st.stop()
 
-    # Clean resume text
-    cleaned_text = clean_text(resume_text)
+    # --------------------------------------------------
+    # Clean Resume Text
+    # --------------------------------------------------
 
-    # Extract resume skills
-    resume_skills = list(dict.fromkeys(extract_skills(cleaned_text)))
+    cleaned_text = clean_text(
+        resume_text
+    )
 
-    # -----------------------------------------------------
-    # Extracted resume text
-    # -----------------------------------------------------
-    st.markdown('<div class="section-title">📋 Extracted Resume Text</div>', unsafe_allow_html=True)
 
-    with st.expander("View extracted resume content", expanded=False):
+    # --------------------------------------------------
+    # Extract Skills
+    # --------------------------------------------------
+
+    resume_skills = extract_skills(
+        cleaned_text
+    )
+
+
+    # ==================================================
+    # EXTRACTED RESUME TEXT
+    # ==================================================
+
+    st.subheader("📋 Extracted Resume Text")
+
+    with st.expander(
+        "View extracted resume content"
+    ):
+
         st.text_area(
             "Resume Content",
             resume_text,
-            height=300,
-            label_visibility="collapsed",
+            height=300
         )
 
-    # -----------------------------------------------------
-    # Resume skills
-    # -----------------------------------------------------
-    st.markdown('<div class="section-title">🧠 Resume Skills</div>', unsafe_allow_html=True)
+
+    # ==================================================
+    # RESUME SKILLS
+    # ==================================================
+
+    st.subheader("🧠 Resume Skills")
 
     if resume_skills:
-        skill_columns = st.columns(3)
-        for index, skill in enumerate(sorted(resume_skills, key=str.lower)):
-            with skill_columns[index % 3]:
+
+        skill_columns = st.columns(4)
+
+        for index, skill in enumerate(
+            resume_skills
+        ):
+
+            with skill_columns[index % 4]:
+
                 st.markdown(
-                    f'<div class="skill-box skill-ok">✅ <b>{skill.title()}</b></div>',
-                    unsafe_allow_html=True,
+                    f"✅ **{skill}**"
                 )
+
     else:
-        st.info("No skills detected.")
 
-    # -----------------------------------------------------
-    # Job description analysis
-    # -----------------------------------------------------
-    if job_description.strip():
-
-        cleaned_job_description = clean_text(job_description)
-
-        # Known skills used by the current analyzer.
-        all_skills = list(
-            dict.fromkeys(
-                resume_skills
-                + [
-                    "python",
-                    "c",
-                    "c++",
-                    "java",
-                    "html",
-                    "css",
-                    "javascript",
-                    "sql",
-                    "machine learning",
-                    "artificial intelligence",
-                    "natural language processing",
-                    "nlp",
-                    "streamlit",
-                    "git",
-                    "github",
-                    "data structures",
-                    "pandas",
-                    "numpy",
-                    "scikit-learn",
-                ]
-            )
+        st.info(
+            "No skills detected."
         )
 
-        # Extract job skills
-        job_skills = extract_job_skills(
-            cleaned_job_description,
-            all_skills,
-        )
 
-        # Calculate job match
-        matched_skills, missing_skills, match_percentage = calculate_match(
-            resume_skills,
-            job_skills,
-        )
+    # ==================================================
+    # JOB DESCRIPTION ANALYSIS
+    # ==================================================
 
-        # ATS analysis
-        (
-            matched_keywords,
-            missing_keywords,
-            keyword_match_percentage,
-        ) = compare_keywords(
-            resume_text,
-            job_description,
-        )
+    cleaned_job_description = clean_text(
+        job_description
+    )
 
-        # Resume score
-        resume_score = calculate_resume_score(
-            resume_text,
-            resume_skills,
-            match_percentage,
-        )
 
-        # -------------------------------------------------
-        # Performance cards
-        # -------------------------------------------------
-        st.markdown(
-            '<div class="section-title">📊 Resume Performance</div>',
-            unsafe_allow_html=True,
-        )
+    # --------------------------------------------------
+    # Skills List
+    # --------------------------------------------------
 
-        score_col1, score_col2, score_col3 = st.columns(3, gap="medium")
+    all_skills = [
+        "Python",
+        "C",
+        "C++",
+        "Java",
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "SQL",
+        "Machine Learning",
+        "Artificial Intelligence",
+        "Natural Language Processing",
+        "Streamlit",
+        "Git",
+        "GitHub",
+        "Data Structures",
+        "Pandas",
+        "NumPy",
+        "Scikit-learn"
+    ]
 
-        with score_col1:
-            st.markdown(
-                f"""
-                <div class="score-card">
-                    <div class="score-label">📄 Resume Score</div>
-                    <div class="score-value">{resume_score:.1f}<span style="font-size:1rem"> / 100</span></div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-            st.progress(min(max(float(resume_score) / 100, 0), 1))
 
-        with score_col2:
-            st.markdown(
-                f"""
-                <div class="score-card">
-                    <div class="score-label">🎯 Job Match</div>
-                    <div class="score-value">{match_percentage:.1f}<span style="font-size:1rem">%</span></div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-            st.progress(min(max(float(match_percentage) / 100, 0), 1))
+    # --------------------------------------------------
+    # Job Skill Matching
+    # --------------------------------------------------
 
-        with score_col3:
-            st.markdown(
-                f"""
-                <div class="score-card">
-                    <div class="score-label">🤖 ATS Match</div>
-                    <div class="score-value">{keyword_match_percentage:.1f}<span style="font-size:1rem">%</span></div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-            st.progress(min(max(float(keyword_match_percentage) / 100, 0), 1))
+    job_skills = extract_job_skills(
+        cleaned_job_description,
+        all_skills
+    )
 
-        # -------------------------------------------------
-        # Job match result
-        # -------------------------------------------------
-        st.markdown(
-            '<div class="section-title">🎯 Job Match Result</div>',
-            unsafe_allow_html=True,
-        )
+    matched_skills, missing_skills, match_percentage = calculate_match(
+        resume_skills,
+        job_skills
+    )
 
-        matched_col, missing_col = st.columns(2, gap="large")
 
-        with matched_col:
-            st.markdown("### ✅ Matched Skills")
+    # --------------------------------------------------
+    # ATS Keyword Analysis
+    # --------------------------------------------------
 
-            if matched_skills:
-                for skill in sorted(set(matched_skills), key=str.lower):
-                    st.markdown(
-                        f'<div class="skill-box skill-ok">✅ {skill.title()}</div>',
-                        unsafe_allow_html=True,
-                    )
-            else:
-                st.info("No matching skills found.")
+    matched_keywords, missing_keywords, keyword_match_percentage = compare_keywords(
+        resume_text,
+        job_description
+    )
 
-        with missing_col:
-            st.markdown("### ❌ Missing Skills")
 
-            if missing_skills:
-                for skill in sorted(set(missing_skills), key=str.lower):
-                    st.markdown(
-                        f'<div class="skill-box skill-missing">❌ {skill.title()}</div>',
-                        unsafe_allow_html=True,
-                    )
-            else:
-                st.success("No missing skills!")
+    # --------------------------------------------------
+    # TF-IDF + COSINE SIMILARITY
+    # --------------------------------------------------
 
-        # -------------------------------------------------
-        # ATS keyword analysis
-        # -------------------------------------------------
-        st.markdown(
-            '<div class="section-title">🤖 ATS Keyword Analysis</div>',
-            unsafe_allow_html=True,
-        )
+    text_similarity_percentage = calculate_text_similarity(
+        resume_text,
+        job_description
+    )
+
+
+    # --------------------------------------------------
+    # RESUME SCORE
+    # --------------------------------------------------
+
+    resume_score = calculate_resume_score(
+        resume_text,
+        resume_skills,
+        match_percentage
+    )
+
+
+    # ==================================================
+    # RESUME PERFORMANCE
+    # ==================================================
+
+    st.subheader("📊 Resume Performance")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+
+    # Resume Score
+    with col1:
 
         st.metric(
-            "ATS Keyword Match",
-            f"{keyword_match_percentage:.2f}%",
-        )
-        st.progress(min(max(float(keyword_match_percentage) / 100, 0), 1))
-
-        ats_col1, ats_col2 = st.columns(2, gap="large")
-
-        with ats_col1:
-            st.markdown("### ✅ Matched Keywords")
-
-            if matched_keywords:
-                for keyword in sorted(set(matched_keywords), key=str.lower):
-                    st.markdown(
-                        f'<div class="skill-box skill-ok">✅ {keyword.title()}</div>',
-                        unsafe_allow_html=True,
-                    )
-            else:
-                st.info("No matched keywords found.")
-
-        with ats_col2:
-            st.markdown("### ❌ Missing Keywords")
-
-            if missing_keywords:
-                for keyword in sorted(set(missing_keywords), key=str.lower):
-                    st.markdown(
-                        f'<div class="skill-box skill-missing">❌ {keyword.title()}</div>',
-                        unsafe_allow_html=True,
-                    )
-            else:
-                st.success("No missing keywords!")
-
-        # -------------------------------------------------
-        # Resume analysis
-        # -------------------------------------------------
-        strengths, improvements, suggestions = analyze_resume(
-            resume_text,
-            resume_skills,
-            missing_skills,
+            "📄 Resume Score",
+            f"{resume_score}/100"
         )
 
-        st.markdown(
-            '<div class="section-title">🔍 Resume Analysis</div>',
-            unsafe_allow_html=True,
+        st.progress(
+            resume_score / 100
         )
 
-        analysis_col1, analysis_col2 = st.columns(2, gap="large")
 
-        with analysis_col1:
-            st.markdown("### 💪 Strengths")
+    # Job Match
+    with col2:
 
-            if strengths:
-                for item in strengths:
-                    st.markdown(
-                        f'<div class="analysis-box">✅ {item}</div>',
-                        unsafe_allow_html=True,
-                    )
-            else:
-                st.info("No major strengths detected.")
+        st.metric(
+            "🎯 Job Match",
+            f"{match_percentage:.2f}%"
+        )
 
-        with analysis_col2:
-            st.markdown("### ⚠️ Areas to Improve")
+        st.progress(
+            match_percentage / 100
+        )
 
-            if improvements:
-                for item in improvements:
-                    st.markdown(
-                        f'<div class="analysis-box">⚠️ {item}</div>',
-                        unsafe_allow_html=True,
-                    )
-            else:
-                st.success("No major improvement areas detected.")
 
-        st.markdown("### 💡 Suggestions")
+    # ATS Match
+    with col3:
 
-        if suggestions:
-            for item in suggestions:
-                st.markdown(
-                    f'<div class="analysis-box">💡 {item}</div>',
-                    unsafe_allow_html=True,
-                )
-        else:
-            st.success("No suggestions at this time.")
+        st.metric(
+            "🤖 ATS Match",
+            f"{keyword_match_percentage:.2f}%"
+        )
+
+        st.progress(
+            keyword_match_percentage / 100
+        )
+
+
+    # NLP Similarity
+    with col4:
+
+        st.metric(
+            "🧠 NLP Similarity",
+            f"{text_similarity_percentage:.2f}%"
+        )
+
+        st.progress(
+            text_similarity_percentage / 100
+        )
+
+
+    # ==================================================
+    # JOB MATCH RESULT
+    # ==================================================
+
+    st.subheader("🎯 Job Match Result")
+
+
+    # --------------------------------------------------
+    # Matched Skills
+    # --------------------------------------------------
+
+    st.write("### ✅ Matched Skills")
+
+    if matched_skills:
+
+        for skill in sorted(
+            matched_skills
+        ):
+
+            st.write(
+                f"✅ {skill}"
+            )
 
     else:
-        st.info("👆 Upload your resume and paste a job description to start the complete analysis.")
 
-else:
-    st.info("👆 Upload a PDF or DOCX resume to begin.")
+        st.write(
+            "No matching skills found."
+        )
+
+
+    # --------------------------------------------------
+    # Missing Skills
+    # --------------------------------------------------
+
+    st.write("### ❌ Missing Skills")
+
+    if missing_skills:
+
+        for skill in sorted(
+            missing_skills
+        ):
+
+            st.write(
+                f"❌ {skill}"
+            )
+
+    else:
+
+        st.write(
+            "No missing skills!"
+        )
+
+
+    # ==================================================
+    # ATS KEYWORD ANALYSIS
+    # ==================================================
+
+    st.subheader("🤖 ATS Keyword Analysis")
+
+    st.metric(
+        "ATS Keyword Match",
+        f"{keyword_match_percentage:.2f}%"
+    )
+
+
+    # --------------------------------------------------
+    # Matched Keywords
+    # --------------------------------------------------
+
+    st.write("### ✅ Matched Keywords")
+
+    if matched_keywords:
+
+        for keyword in sorted(
+            matched_keywords
+        ):
+
+            st.write(
+                f"✅ {keyword}"
+            )
+
+    else:
+
+        st.write(
+            "No matched keywords found."
+        )
+
+
+    # --------------------------------------------------
+    # Missing Keywords
+    # --------------------------------------------------
+
+    st.write("### ❌ Missing Keywords")
+
+    if missing_keywords:
+
+        for keyword in sorted(
+            missing_keywords
+        ):
+
+            st.write(
+                f"❌ {keyword}"
+            )
+
+    else:
+
+        st.write(
+            "No missing keywords!"
+        )
+
+
+    # ==================================================
+    # NLP SIMILARITY ANALYSIS
+    # ==================================================
+
+    st.subheader(
+        "🧠 NLP Similarity Analysis"
+    )
+
+    st.write(
+        "TF-IDF and Cosine Similarity compare the textual "
+        "similarity between the resume and job description."
+    )
+
+    st.metric(
+        "Resume–Job Description Similarity",
+        f"{text_similarity_percentage:.2f}%"
+    )
+
+    st.progress(
+        text_similarity_percentage / 100
+    )
+
+
+    # ==================================================
+    # RESUME ANALYSIS
+    # ==================================================
+
+    strengths, improvements, suggestions = analyze_resume(
+        resume_text,
+        resume_skills,
+        missing_skills
+    )
+
+
+    st.subheader(
+        "🔍 Resume Analysis"
+    )
+
+
+    # --------------------------------------------------
+    # Strengths
+    # --------------------------------------------------
+
+    st.write("### 💪 Strengths")
+
+    if strengths:
+
+        for item in strengths:
+
+            st.write(
+                f"✅ {item}"
+            )
+
+    else:
+
+        st.write(
+            "No major strengths detected."
+        )
+
+
+    # --------------------------------------------------
+    # Areas to Improve
+    # --------------------------------------------------
+
+    st.write(
+        "### ⚠️ Areas to Improve"
+    )
+
+    if improvements:
+
+        for item in improvements:
+
+            st.write(
+                f"⚠️ {item}"
+            )
+
+    else:
+
+        st.write(
+            "No major improvement areas detected."
+        )
+
+
+    # --------------------------------------------------
+    # Suggestions
+    # --------------------------------------------------
+
+    st.write("### 💡 Suggestions")
+
+    if suggestions:
+
+        for item in suggestions:
+
+            st.write(
+                f"💡 {item}"
+            )
+
+    else:
+
+        st.write(
+            "No suggestions at this time."
+        )
+
+
+    # ==================================================
+    # DOWNLOAD ANALYSIS REPORT
+    # ==================================================
+
+    st.subheader(
+        "📥 Download Analysis Report"
+    )
+
+    report = generate_report(
+        resume_name=uploaded_file.name,
+        resume_score=resume_score,
+        match_percentage=match_percentage,
+        keyword_match_percentage=keyword_match_percentage,
+        text_similarity_percentage=text_similarity_percentage,
+        resume_skills=resume_skills,
+        matched_skills=matched_skills,
+        missing_skills=missing_skills,
+        matched_keywords=matched_keywords,
+        missing_keywords=missing_keywords,
+        strengths=strengths,
+        improvements=improvements,
+        suggestions=suggestions
+    )
+
+
+    st.download_button(
+    label="📥 Download Report",
+    data=report,
+    file_name="resume_analysis_report.pdf",
+    mime="application/pdf",
+    use_container_width=True
+)
+
+# ==================================================
+# PROFESSIONAL FOOTER
+# ==================================================
+
+st.markdown("---")
+
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <h3>AI/ML Resume Analyzer</h3>
+        <p>Intelligent Resume Screening • NLP • Machine Learning</p>
+        <p>Developed by <b>Ansh Vishwakarma</b> • B.Tech CSE (AI/ML)</p>
+        <p>© 2026 • AI/ML Resume Analyzer</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
+# ==================================================
+# SOCIAL PROFILE BUTTONS
+# ==================================================
+
+st.markdown(
+    "<div style='text-align: center;'>",
+    unsafe_allow_html=True
+)
+
+col1, col2, col3, col4, col5 = st.columns(
+    [1, 1, 0.5, 1, 1]
+)
+
+with col2:
+
+    st.link_button(
+        "💻 GitHub",
+        "https://github.com/Anshvishwakarma51",
+        use_container_width=True
+    )
+
+with col4:
+
+    st.link_button(
+        "🔗 LinkedIn",
+        "https://www.linkedin.com/in/anshvishwakarma51/",
+        use_container_width=True
+    )
+
+st.markdown(
+    "</div>",
+    unsafe_allow_html=True
+)
