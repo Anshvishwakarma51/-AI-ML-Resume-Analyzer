@@ -46,7 +46,7 @@ Allenhouse Institute of Technology, Kanpur
 ![Resume Performance](<Screenshot 2026-09-19 181508.png>)
 
 ### ATS Analysis
-![ATS Analysis](<Screenshot 2026-09-19 181609.png>)
+![ATS Analysis](<Screenshot 2026-09-19 181508.png>)
 
 ### Suggestions and Recommendations
 ![Suggestions and Recommendations](<Screenshot 2026-09-19 181629.png>)
