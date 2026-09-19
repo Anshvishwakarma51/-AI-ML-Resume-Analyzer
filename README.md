@@ -45,8 +45,11 @@ Allenhouse Institute of Technology, Kanpur
 ### Resume Performance
 ![Resume Performance](<Screenshot 2026-09-19 181508.png>)
 
-### ATS and NLP Analysis
-![ATS and NLP Analysis](<Screenshot 2026-09-19 181609.png>)
+### ATS Analysis
+![ATS Analysis](<Screenshot 2026-09-19 181609.png>)
+
+### Suggestions and Recommendations
+![Suggestions and Recommendations](<Screenshot 2026-09-19 181629.png>)
 
 ### Download Analysis Report
-![Download Analysis Report](<Screenshot 2026-09-19 181629.png>)
+![Download Analysis Report](<Screenshot 2026-09-19 181646.png>)
