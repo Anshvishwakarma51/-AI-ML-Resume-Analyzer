@@ -28,6 +28,10 @@ An AI/ML-based web application that analyzes a resume against a job description.
 
 https://aiml-resume-analyzer.streamlit.app/
 
+## Sample Analysis Report
+
+[View Sample Resume Analysis Report](sample_resume_analysis_report.pdf)
+
 ## Developer
 
 Ansh Vishwakarma  
