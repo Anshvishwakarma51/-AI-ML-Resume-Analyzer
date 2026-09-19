@@ -33,3 +33,20 @@ https://aiml-resume-analyzer.streamlit.app/
 Ansh Vishwakarma  
 B.Tech CSE (AI & ML)  
 Allenhouse Institute of Technology, Kanpur
+
+## Screenshots
+
+### Main Application
+![Main Application](<Screenshot 2026-09-19 180616.png>)
+
+### Resume Analysis
+![Resume Analysis](<Screenshot 2026-09-19 181431.png>)
+
+### Resume Performance
+![Resume Performance](<Screenshot 2026-09-19 181508.png>)
+
+### ATS and NLP Analysis
+![ATS and NLP Analysis](<Screenshot 2026-09-19 181609.png>)
+
+### Download Analysis Report
+![Download Analysis Report](<Screenshot 2026-09-19 181629.png>)
